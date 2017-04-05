@@ -208,84 +208,149 @@
         <boolProp name="resetInterpreter">false</boolProp>
         <stringProp name="parameters"></stringProp>
         <stringProp name="filename"></stringProp>
-        <stringProp name="script">arguments = ctx.getCurrentSampler().getArguments();
+        <stringProp name="script">import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import org.apache.commons.lang.StringUtils;
+
+
+boolean isJSONValid(String test) {
+    try {
+	JSONParser parser = new JSONParser();
+	JSONObject obj = (JSONObject) parser.parse(test);
+    } catch (ex) {
+            return false;
+    }
+    return true;
+}
+
+arguments = ctx.getCurrentSampler().getArguments();
 
 for (int i=0; i&lt;arguments.getArgumentCount(); i++) {
-      argument = arguments.getArgument(i);
-      if (argument.getName().contains(&quot;email&quot;)) {
-          String newVal = ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+argument.getValue();
-		//print (&quot;+&gt;&quot;+newVal);
-          argument.setValue(newVal);
-      }
-      if (argument.getValue().contains(&quot;\&quot;slug\&quot;:\&quot;team&quot;)){
-      	String newVal = argument.getValue();      	
-		String v = newVal.replaceAll(&quot;\&quot;slug\&quot;:\&quot;team&quot;, &quot;\&quot;slug\&quot;:\&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;);
-		//print (&quot;+&gt;&quot;+v);
-          argument.setValue(v);          
-      }
-      if (argument.getValue().contains(&quot;\&quot;slug_0\&quot;:\&quot;team&quot;)){
-      	String newVal = argument.getValue();      	
-		String v = newVal.replaceAll(&quot;\&quot;slug_0\&quot;:\&quot;team&quot;, &quot;\&quot;slug_0\&quot;:\&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;);
-		//print (&quot;+&gt;&quot;+v);
-          argument.setValue(v);          
-      }
-      if (argument.getValue().contains(&quot;\&quot;team\&quot;:\&quot;team&quot;)){
-      	String newVal = argument.getValue();      	
-		String v = newVal.replaceAll(&quot;\&quot;team\&quot;:\&quot;team&quot;, &quot;\&quot;team\&quot;:\&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;);
-		//print (&quot;+&gt;&quot;+v);
-          argument.setValue(v);          
-      }
-      if (argument.getValue().contains(&quot;\&quot;name\&quot;:\&quot;team&quot;)){
-      	String newVal = argument.getValue();      	
-		String v = newVal.replaceAll(&quot;\&quot;name\&quot;:\&quot;team&quot;, &quot;\&quot;name\&quot;:\&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;);
-		//print (&quot;+&gt;&quot;+v);
-          argument.setValue(v);          
-      }
-      if (argument.getValue().contains(&quot;\&quot;title\&quot;:\&quot;Project&quot;)){
-      	String newVal = argument.getValue();      	
-		String v = newVal.replaceAll(&quot;\&quot;title\&quot;:\&quot;Project&quot;, &quot;\&quot;title\&quot;:\&quot;Project&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;);
-		//print (&quot;+&gt;&quot;+v);
-          argument.setValue(v);          
-      }
 
-      if (argument.getValue().contains(&quot;\&quot;variables\&quot;:{\&quot;id_0\&quot;:&quot;)){
-      	String a = argument.getValue();      	
-		print (&quot;\n\nENtradA pR+&gt;&quot;+a);
-		String[] lid = vars.get(&quot;project_ids&quot;).split(&quot;,&quot;);
-		String end = &quot;&quot;;
-		String start = &quot;&quot;;
-		if (a.contains(&quot;\&quot;},\&quot;team\&quot;:\&quot;&quot;)){
-	     	print (&quot;AQUI&quot;);
-			start = a.substring(0,a.indexOf(&quot;\&quot;variables\&quot;:{\&quot;id_0\&quot;:&quot;)+21);
-			start = start + lid[lid.length - 1];
-			end = a.substring(a.indexOf(&quot;\&quot;},\&quot;team\&quot;:\&quot;&quot;),a.length());    	
-	     } else {
-	     	print (&quot;AQCASASA&quot;);
-			start = a.substring(0,a.indexOf(&quot;\&quot;variables\&quot;:{\&quot;id_0\&quot;:&quot;)+20);
-			start = start + lid[lid.length - 1];
-			end = a.substring(a.indexOf(&quot;},\&quot;team\&quot;:\&quot;&quot;),a.length());    	
-	     }
-		String v = start + end;
-		print (&quot;\n+FINAL&gt;&quot;+v);
-          argument.setValue(v);          
-      }
-      
-      if (argument.getValue().contains(&quot;mutation CreateProject&quot;)){
-		a = argument.toString();
-		String team = a.substring(a.indexOf(&quot;\&quot;team\&quot;:&quot;)+8,a.length()-2);
-		String id = a.substring(a.indexOf(&quot;\&quot;team_id\&quot;:&quot;)+10,a.indexOf(&quot;,\&quot;clientMutationId&quot;));	
-		String[] li = vars.get(&quot;team_ids&quot;).split(&quot;,&quot;);
-		String[] lu = vars.get(&quot;team_slugs&quot;).split(&quot;,&quot;);
-		for (int i = 0; i &lt; lu.length; i++) {
-		  if (lu[i].equals(team)){
-		      id = li[i];
-		  }
+     argument = arguments.getArgument(i);
+	String a = argument.toString();
+	if (a.length() &gt; 1){
+		a = a.substring(1, a.length());
+	}else{
+		a = &quot;&quot;;
+	}
+
+     if (argument.getName().contains(&quot;email&quot;)) {
+          String newVal = ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+argument.getValue();
+          argument.setValue(newVal);
+      }else if (isJSONValid(a)) 
+      {
+	      
+	 	JSONParser json_parser = new JSONParser();
+		JSONObject json_obj = (JSONObject) json_parser.parse(a);
+
+			/*for(Iterator iterator = json_obj.keySet().iterator(); iterator.hasNext();) {
+			    String key = (String) iterator.next();
+			    print(key);
+			    //print(jsonObject.get(key));
+			}		print (&quot;.....&quot;);
+			*/
+			
+		if (argument.getValue().contains(&quot;\&quot;slug\&quot;:\&quot;team&quot;)){
+		     JSONObject v = (JSONObject)  json_obj.get(&quot;variables&quot;);
+		     JSONObject i = (JSONObject)  v.get(&quot;input_0&quot;);
+		     String old = i.get(&quot;slug&quot;).toString();
+		     old = old.replace(&quot;team&quot;,&quot;&quot;);
+			i.put(&quot;slug&quot;,&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;+old);	
+			v.put(&quot;input_0&quot;,i);
+			json_obj.put(&quot;variables&quot;,v);
+		     argument.setValue(json_obj.toString());       
 		}
-		String v = a.substring(1,a.indexOf(&quot;\&quot;team_id\&quot;:&quot;)+10) + id ;
-		v = v + a.substring(a.indexOf(&quot;,\&quot;clientMutationId&quot;) , a.indexOf(&quot;\&quot;team\&quot;:&quot;)+8);
-		v = v +team + &quot;\&quot;}&quot;;
-		argument.setValue(v);    
-	 }
+		      
+	      if (argument.getValue().contains(&quot;\&quot;slug_0\&quot;:\&quot;team&quot;)){
+		     JSONObject i = (JSONObject)  json_obj.get(&quot;variables&quot;);
+		     String old = i.get(&quot;slug_0&quot;).toString();
+		     old = old.replace(&quot;team&quot;,&quot;&quot;);
+			i.put(&quot;slug_0&quot;,&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;+old);	
+			json_obj.put(&quot;variables&quot;,i);
+		     argument.setValue(json_obj.toString());		            
+	      }
+
+
+	      if (argument.getValue().contains(&quot;\&quot;team\&quot;:\&quot;team&quot;)){
+		     String old = json_obj.get(&quot;team&quot;).toString();
+		     old = old.replace(&quot;team&quot;,&quot;&quot;);
+			json_obj.put(&quot;team&quot;,&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;+old);	
+		     argument.setValue(json_obj.toString());		            
+	      }
+	      
+		
+	      if (argument.getValue().contains(&quot;\&quot;name\&quot;:\&quot;team&quot;)){
+		     JSONObject v = (JSONObject)  json_obj.get(&quot;variables&quot;);
+		     JSONObject i = (JSONObject)  v.get(&quot;input_0&quot;);
+		     String old = i.get(&quot;name&quot;).toString();
+		     old = old.replace(&quot;team&quot;,&quot;&quot;);
+			i.put(&quot;name&quot;,&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;+old);	
+			v.put(&quot;input_0&quot;,i);
+			json_obj.put(&quot;variables&quot;,v);
+		     argument.setValue(json_obj.toString())         ;
+	      }
+	      
+	      if (argument.getValue().contains(&quot;\&quot;title\&quot;:\&quot;Project&quot;)){
+		     JSONObject v = (JSONObject)  json_obj.get(&quot;variables&quot;);
+		     JSONObject i = (JSONObject)  v.get(&quot;input_0&quot;);
+		     String old = i.get(&quot;title&quot;).toString();
+		     old = old.replace(&quot;Project&quot;,&quot;&quot;);
+			i.put(&quot;title&quot;,&quot;Project&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;+old);	
+			v.put(&quot;input_0&quot;,i);
+			json_obj.put(&quot;variables&quot;,v);
+		     argument.setValue(json_obj.toString())         ;
+		 }
+	
+
+	      if (argument.getValue().contains(&quot;\&quot;variables\&quot;:{\&quot;id_0\&quot;:&quot;)){
+			String a = argument.toString();
+			a = a.substring(1, a.length());
+			JSONParser parser = new JSONParser();
+			JSONObject obj = (JSONObject) parser.parse(a);
+		     JSONObject v = (JSONObject)  obj.get(&quot;variables&quot;);     
+			String[] lid = vars.get(&quot;project_ids&quot;).split(&quot;,&quot;);
+			v.put(&quot;id_0&quot;, lid[lid.length - 1]);
+			obj.put(&quot;variables&quot;, v);
+	          argument.setValue(obj.toString());    
+	      }
+
+	  	 if (argument.getValue().contains(&quot;mutation CreateProject&quot;)){
+			JSONParser parser = new JSONParser();
+			String a = argument.toString();
+			
+		     String v_original = a;
+			v_original = a = &quot;{&quot;+a.substring(a.indexOf(&quot;\&quot;variables\&quot;:{&quot;),a.length())+&quot;}&quot;;
+		     Object obj = parser.parse(a);
+		     JSONObject v = (JSONObject)  obj.get(&quot;variables&quot;);
+		     JSONObject input = (JSONObject)  v.get(&quot;input_0&quot;);
+			String[] li = vars.get(&quot;team_ids&quot;).split(&quot;,&quot;);
+			String[] lu = vars.get(&quot;team_slugs&quot;).split(&quot;,&quot;);
+			String team =   obj.get(&quot;team&quot;);
+			int id = 0;
+			print (&quot;LU&quot;);
+			print (lu);
+			print (&quot;LI&quot;);
+			print (li);
+			for (int i = 0; i &lt; lu.length; i++) {
+			  if (lu[i].equals(team)){
+			      id = Integer.parseInt(li[i]);
+			  }
+			}
+			input.put(&quot;team_id&quot;,id);	
+			v.put(&quot;input_0&quot;, input);
+			obj.put(&quot;variables&quot;, v);
+			a = argument.toString();	
+			v_original = v_original.substring(1, v_original.length()-1);
+			String n = obj.toString();
+			n = n.substring(1, n.length());
+			a = a.replace(v_original, n);
+			a = a.substring(1, a.length());
+	          argument.setValue(a);       
+		}
+        }
+
 }
 sampler.setArguments(arguments);  
 </stringProp>
@@ -295,39 +360,67 @@ sampler.setArguments(arguments);
         <stringProp name="filename"></stringProp>
         <stringProp name="parameters"></stringProp>
         <boolProp name="resetInterpreter">false</boolProp>
-        <stringProp name="script">response = prev.getResponseDataAsString();
+        <stringProp name="script">import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import org.apache.commons.lang.StringUtils;
 
+response = prev.getResponseDataAsString();
+
+
+//USER
+if (response.contains(&quot;{\&quot;data\&quot;:{\&quot;me\&quot;:&quot;)){
+    String jsonString  = response;
+    JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
+    JSONObject obj = (JSONObject) parser.parse(data);
+    JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
+    JSONObject m = (JSONObject)  d.get(&quot;me&quot;);
+    String id = (String)m.get(&quot;id&quot;);
+}
+
+ //{&quot;data&quot;:{&quot;createTeam&quot;:{&quot;clientMutationId&quot;:&quot;0&quot;,&quot;team&quot;:{&quot;id&quot;:&quot;VGVhbS84NDE=\n&quot;,&quot;name&quot;:&quot;team08002252-11490812352&quot;,&quot;dbid&quot;:841,&quot;slug&quot;:&quot;team08002252-11490812352&quot;,&quot;description&quot;:&quot;&quot;}}}}
 if (response.contains(&quot;\&quot;data\&quot;:{\&quot;createTeam&quot;)){
-     print (response);
+	print (&quot; \n *STAR**&quot;);
+    String jsonString  = response;
+    JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
+    JSONObject obj = (JSONObject) parser.parse(data);
+    JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
+    JSONObject m = (JSONObject)  d.get(&quot;createTeam&quot;);
+    JSONObject t = (JSONObject)  m.get(&quot;team&quot;);
+    String slug = (String)t.get(&quot;slug&quot;);
+    int id = (int)t.get(&quot;dbid&quot;);
 	String s =  vars.get(&quot;team_ids&quot;);
 	String u =  vars.get(&quot;team_slugs&quot;);
-	print (&quot; \n *STAR**&quot;);
-	id = response.substring(response.indexOf(&quot;dbid&quot;)+6 , response.indexOf(&quot;,\&quot;slug&quot;));
-	slug = response.substring(response.indexOf(&quot;slug&quot;)+7 , response.indexOf(&quot;\&quot;,\&quot;description&quot;));
 	if (s.length() &gt; 0 ){
-		s = s + &quot;,&quot; + id;
+		s = s + &quot;,&quot; + Integer.toString(id);
 		vars.put(&quot;team_ids&quot;, s);
 		u = u + &quot;,&quot; + slug;
 		vars.put(&quot;team_slugs&quot;, u);
-
 	} else {
-		vars.put(&quot;team_ids&quot;, id);
+		vars.put(&quot;team_ids&quot;, Integer.toString(id));
 		vars.put(&quot;team_slugs&quot;, slug);		
 	}
 	print (&quot;ARRAYS team == &quot;);
 	print (vars.get(&quot;team_ids&quot;));
+	print (&quot;== &quot;);
 	print (vars.get(&quot;team_slugs&quot;));
 	print (&quot;FIM TEAM ******* \n  \n&quot;);
 }
 
-
+//{&quot;data&quot;:{&quot;createProject&quot;:{&quot;clientMutationId&quot;:&quot;0&quot;,&quot;project&quot;:{&quot;dbid&quot;:806,&quot;id&quot;:&quot;UHJvamVjdC84MDY=\n&quot;},&quot;projectEdge&quot;:{&quot;cursor&quot;:&quot;MQ==&quot;,&quot;__typename&quot;:&quot;ProjectEdge&quot;,&quot;node&quot;:{&quot;title&quot;:&quot;Project08495287- 2017-03-29 18:34:55 +0000&quot;,&quot;dbid&quot;:806,&quot;id&quot;:&quot;UHJvamVjdC84MDY=\n&quot;,&quot;description&quot;:&quot;&quot;}},&quot;team&quot;:{&quot;id&quot;:&quot;VGVhbS84NDU=\n&quot;}}}}
 if (response.contains(&quot;\&quot;data\&quot;:{\&quot;createProject&quot;)){
-	print (&quot; \n *STAR project RESPONSE**&quot;);
-     print (response);
+    String jsonString  = response;
+    JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
+    JSONObject obj = (JSONObject) parser.parse(data);
+    JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
+    JSONObject m = (JSONObject)  d.get(&quot;createProject&quot;);
+    JSONObject p = (JSONObject)  m.get(&quot;projectEdge&quot;);
+    JSONObject n = (JSONObject)  p.get(&quot;node&quot;);
+    String slug = (String)n.get(&quot;title&quot;);
+    String id = Integer.toString((int)n.get(&quot;dbid&quot;));
+
 	String s =  vars.get(&quot;project_ids&quot;);
 	String u =  vars.get(&quot;project_titles&quot;);
-	id = response.substring(response.indexOf(&quot;dbid&quot;)+6 , response.indexOf(&quot;,\&quot;id\&quot;:&quot;));
-	slug = response.substring(response.indexOf(&quot;title&quot;)+7 , response.indexOf(&quot;\&quot;,\&quot;dbid&quot;));
 	if (s.length() &gt; 0 ){
 		s = s + &quot;,&quot; + id;
 		vars.put(&quot;project_ids&quot;, s);
@@ -338,11 +431,6 @@ if (response.contains(&quot;\&quot;data\&quot;:{\&quot;createProject&quot;)){
 		vars.put(&quot;project_ids&quot;, id);
 		vars.put(&quot;project_titles&quot;, slug);		
 	}
-	print (&quot;ARRAYS proj == &quot;);
-	print (vars.get(&quot;project_ids&quot;));
-	print (vars.get(&quot;project_titles&quot;));
-	print (&quot;FIM POST PROJECT******* \n  \n&quot;);
-
 
 }</stringProp>
       </BeanShellPostProcessor>
@@ -2900,12 +2988,14 @@ if (response.contains(&quot;\&quot;data\&quot;:{\&quot;createProject&quot;)){
                   <stringProp name="Argument.name">api_user[email]</stringProp>
                   <stringProp name="Argument.value">sysops1490812352@meedan.com</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
                 <elementProp name="api_user[password]" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">api_user[password]</stringProp>
                   <stringProp name="Argument.value">12345678</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
@@ -8043,6 +8133,13 @@ if (response.contains(&quot;\&quot;data\&quot;:{\&quot;createProject&quot;)){
           </hashTree>
         </hashTree>
       </hashTree>
+      <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion" enabled="true">
+        <stringProp name="BeanShellAssertion.query"></stringProp>
+        <stringProp name="BeanShellAssertion.filename"></stringProp>
+        <stringProp name="BeanShellAssertion.parameters"></stringProp>
+        <boolProp name="BeanShellAssertion.resetInterpreter">false</boolProp>
+      </BeanShellAssertion>
+      <hashTree/>
     </hashTree>
     <WorkBench guiclass="WorkBenchGui" testclass="WorkBench" testname="WorkBench" enabled="true">
       <boolProp name="WorkBench.save">true</boolProp>
