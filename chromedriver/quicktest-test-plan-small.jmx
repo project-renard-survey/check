@@ -511,6 +511,11 @@
               <stringProp name="Argument.value"></stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
+            <elementProp name="x-check-token" elementType="Argument">
+              <stringProp name="Argument.name">x-check-token</stringProp>
+              <stringProp name="Argument.value"></stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
           </collectionProp>
         </Arguments>
         <hashTree/>
@@ -523,6 +528,7 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jmeter.protocol.http.control.CookieManager;
+import org.apache.jmeter.protocol.http.control.Header; 
 
 
 boolean isJSONValid(String test) {
@@ -537,8 +543,7 @@ boolean isJSONValid(String test) {
 
 arguments = ctx.getCurrentSampler().getArguments();
 log.info (&quot;====&quot;);
-log.info (ctx.getCurrentSampler().getName().toString() + &quot; == &quot; + ctx.getThreadNum().toString() + &quot; *** ANT + &quot; + vars.get(&quot;media_dbid&quot;).toString());
-
+log.info (ctx.getCurrentSampler().getName().toString() + &quot; == &quot; + ctx.getThreadNum().toString() + &quot;&gt;&gt;&gt;&gt;&quot;+ vars.get(&quot;x-check-token&quot;).toString()  + &quot; ++ &quot; + vars.get(&quot;team_ids&quot;).toString() + &quot;%% &quot; + vars.get(&quot;user_ids&quot;).toString() + &quot;%% &quot; + vars.get(&quot;id&quot;).toString() + &quot;%% &quot; + vars.get(&quot;user_id&quot;).toString() + &quot;%% &quot; + vars.get(&quot;user_dbid&quot;).toString() + &quot;%% MEDia-&gt; &quot; + vars.get(&quot;media_dbid&quot;).toString()+&quot;TTT-&gt;&quot;+vars.get(&quot;team_id&quot;).toString());
 
 try {
 	if (ctx.getCurrentSampler().getName().contains(&quot;/api/users/sign_in&quot;)){	
@@ -548,6 +553,10 @@ try {
 } catch (Exception ex) {
     log.info(&quot;Error in beanshell&quot;);
 }
+
+
+sampler.getHeaderManager().removeHeaderNamed(&quot;x-check-token&quot;); 
+sampler.getHeaderManager().add(new Header(&quot;x-check-token&quot;,vars.get(&quot;x-check-token&quot;))); 
 
 
 for (int n=0; n&lt;arguments.getArgumentCount(); n++) {
@@ -748,6 +757,9 @@ for (int n=0; n&lt;arguments.getArgumentCount(); n++) {
 
 		if (argument.getValue().contains(&quot;\&quot;id\&quot;:&quot;)){
 			if  (argument.getValue().contains(&quot;UpdateTeamUser&quot;)) {
+				log.info (&quot;UpdateTeamUser+++++++++++++++++++&quot;);
+				log.info ( vars.get(&quot;team_user_id&quot;));			
+				log.info (&quot;***&quot;);
 				i.put(&quot;id&quot;, vars.get(&quot;team_user_id&quot;));			
 			}else if (argument.getValue().contains(&quot;UpdateUser&quot;)) {			
 				i.put(&quot;id&quot;, vars.get(&quot;id&quot;));			
@@ -757,6 +769,7 @@ for (int n=0; n&lt;arguments.getArgumentCount(); n++) {
 				log.info (&quot;***&quot;);
 				i.put(&quot;id&quot;, vars.get(&quot;annotation_id&quot;));			
 			}else{
+				log.info (&quot;***TEAM_ID***&quot;);
 				i.put(&quot;id&quot;, vars.get(&quot;team_id&quot;));			
 			}
 		}			
@@ -782,6 +795,7 @@ import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang.StringUtils;
 
 response = prev.getResponseDataAsString();
+try {
 
 if (response.contains(&quot;\&quot;type\&quot;:\&quot;user\&quot;,\&quot;data\&quot;:{\&quot;id\&quot;:&quot;)){
     String jsonString  = response;
@@ -789,7 +803,7 @@ if (response.contains(&quot;\&quot;type\&quot;:\&quot;user\&quot;,\&quot;data\&q
     JSONObject obj = (JSONObject) parser.parse(data);
     JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
     vars.put(&quot;user_dbid&quot;, Integer.toString((int)d.get(&quot;dbid&quot;)));
-    //vars.put(&quot;annotated_dbid&quot;, (String)d.get(&quot;id&quot;));
+    vars.put(&quot;x-check-token&quot;, d.get(&quot;token&quot;).toString());
 }
 
 if (response.contains(&quot;\&quot;data\&quot;:{\&quot;createTeam\&quot;&quot;)){
@@ -812,6 +826,10 @@ if (response.contains(&quot;\&quot;data\&quot;:{\&quot;createTeam\&quot;&quot;))
 		vars.put(&quot;team_ids&quot;, Integer.toString(id));
 		vars.put(&quot;team_slugs&quot;, slug);		
 	}
+	log.info (&quot;NEW ID&quot;);
+     vars.put(&quot;team_id&quot;, (String)t.get(&quot;id&quot;));
+     vars.put(&quot;team_dbid&quot;, Integer.toString(id));
+	log.info ((String)t.get(&quot;id&quot;));
 }
 
 if (response.contains(&quot;\&quot;project_mediaEdge\&quot;&quot;)){
@@ -824,18 +842,35 @@ if (response.contains(&quot;\&quot;project_mediaEdge\&quot;&quot;)){
     JSONObject n = (JSONObject)  n.get(&quot;node&quot;);
     vars.put(&quot;annotated_dbid&quot;, (String)n.get(&quot;dbid&quot;));
 }
-					
+
+				
 if (response.contains(&quot;\&quot;project_media\&quot;:{\&quot;dbid\&quot;&quot;)){
+	log.info (&quot;\n MMMMMMM project_media\&quot;:{\&quot;dbid\&quot;&quot;);
     String jsonString  = response;
     JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
     JSONObject obj = (JSONObject) parser.parse(data);
+	log.info (&quot;SSSSS&quot;);
+	log.info (obj.toString());
     JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
+	log.info (&quot;SSSSS&quot;);
+	log.info (d.toString());
     JSONObject c = (JSONObject)  d.get(&quot;createProjectMedia&quot;);
+	log.info (&quot;SSSSS&quot;);
+	log.info (c.toString());
     JSONObject m = (JSONObject)  c.get(&quot;project_media&quot;);
-    vars.put(&quot;media_id&quot;, (String)m.get(&quot;id&quot;));
-    vars.put(&quot;media_dbid&quot;, Integer.toString((int)m.get(&quot;dbid&quot;)));
-}
+	log.info (&quot;SSSSS m&quot;);
+	log.info (m.toString());
+	
+    if (m.toString().contains(&quot;bdib&quot;)) {
+    	log.info (&quot;YYYESSS&quot;);
+	    vars.put(&quot;media_id&quot;, (String)m.get(&quot;id&quot;));
+	    vars.put(&quot;media_dbid&quot;, Integer.toString((int)m.get(&quot;dbid&quot;)));
+    }else{
+    	    	log.info (&quot;NO no no&quot;);
+	}
 
+}
+/*
 
 if (response.contains(&quot;\&quot;_project_medias1oLJgo\&quot;:&quot;)){
     String jsonString  = response;
@@ -846,7 +881,7 @@ if (response.contains(&quot;\&quot;_project_medias1oLJgo\&quot;:&quot;)){
     JSONObject p = (JSONObject)  n.get(&quot;_project_medias1oLJgo&quot;);
     JSONObject e = (JSONArray)  p.get(&quot;edges&quot;);
     JSONObject f = (JSONObject) e.getJSONObject(0);
-}
+}*/
 
 //{&quot;data&quot;:{&quot;createTeamUser&quot;:{&quot;clientMutationId&quot;:&quot;0&quot;,&quot;team_user&quot;:{&quot;id&quot;:&quot;VGVhbVVzZXIvMjU5OA==\n&quot;,&quot;status&quot;:&quot;requested&quot;}}}}
 if (response.contains(&quot;{\&quot;data\&quot;:{\&quot;createTeamUser\&quot;&quot;)){
@@ -856,19 +891,40 @@ if (response.contains(&quot;{\&quot;data\&quot;:{\&quot;createTeamUser\&quot;&qu
     JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
     JSONObject c = (JSONObject)  d.get(&quot;createTeamUser&quot;);
     JSONObject t = (JSONObject)  c.get(&quot;team_user&quot;);
-    String id = (String)t.get(&quot;id&quot;);
-    vars.put(&quot;team_user_id&quot;, id);
+    vars.put(&quot;team_user_id&quot;, (String)t.get(&quot;id&quot;));
 }
 
-if (response.contains(&quot;{\&quot;data\&quot;:{\&quot;team\&quot;:{\&quot;id\&quot;:\&quot;&quot;)){
+
+
+if  (response.contains(&quot;{\&quot;data\&quot;:{\&quot;team\&quot;:{\&quot;id\&quot;:\&quot;&quot;)){
     String jsonString  = response;
     JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
     JSONObject obj = (JSONObject) parser.parse(data);
     JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
+    log.info (d.toString());
     JSONObject p = (JSONObject)  d.get(&quot;team&quot;);
-    vars.put(&quot;team_id&quot;, (String)p.get(&quot;id&quot;));
-    vars.put(&quot;team_dbid&quot;, Integer.toString((int)p.get(&quot;dbid&quot;)));
+    log.info (p.toString());
+    if (p.toString().contains(&quot;bdib&quot;)) {
+	    vars.put(&quot;team_id&quot;, (String)p.get(&quot;id&quot;));
+	    vars.put(&quot;team_dbid&quot;, Integer.toString((int)p.get(&quot;dbid&quot;)));
+    }
+	log.info (vars.get(&quot;team_dbid&quot;).toString());
 } 
+
+if (response.contains(&quot;\&quot;current_team\&quot;:{\&quot;&quot;)) {
+	log.info (&quot;\n @@@@@@@@@@TEAM $$$$$$$$&quot;);
+    String jsonString  = response;
+    JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
+    JSONObject obj = (JSONObject) parser.parse(data);
+    JSONObject d = (JSONObject)  obj.get(&quot;current_team&quot;);
+    log.info (d.toString());
+    if (d.toString().contains(&quot;bdib&quot;)) {
+	    vars.put(&quot;team_id&quot;, (String)d.get(&quot;id&quot;));
+	    vars.put(&quot;team_dbid&quot;, Integer.toString((int)d.get(&quot;dbid&quot;)));
+    }
+	log.info (vars.get(&quot;team_dbid&quot;).toString());
+} 
+
 
 if (response.contains(&quot;\&quot;data\&quot;:{\&quot;project\&quot;:{\&quot;id\&quot;:\&quot;&quot;)){
    String jsonString  = response;
@@ -876,8 +932,10 @@ if (response.contains(&quot;\&quot;data\&quot;:{\&quot;project\&quot;:{\&quot;id
     JSONObject obj = (JSONObject) parser.parse(data);
     JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
     JSONObject p = (JSONObject)  d.get(&quot;project&quot;);
-    vars.put(&quot;project_id&quot;, (String)p.get(&quot;id&quot;));
-    vars.put(&quot;project_dbid&quot;, Integer.toString((int)p.get(&quot;dbid&quot;)));
+    if (p.toString().contains(&quot;bdib&quot;)) {
+	    vars.put(&quot;project_id&quot;, (String)p.get(&quot;id&quot;));
+	    vars.put(&quot;project_dbid&quot;, Integer.toString((int)p.get(&quot;dbid&quot;)));
+    }
 }
 
 //USER
@@ -900,36 +958,45 @@ if (response.contains(&quot;{\&quot;data\&quot;:{\&quot;me\&quot;:&quot;)){
 	vars.put(&quot;id&quot;, id);
 }
 
-
 if (response.contains(&quot;\&quot;createComment\&quot;&quot;)){
      log.info (&quot;==CREATECOMMENT==&quot;);
    String jsonString  = response;
     JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
     JSONObject obj = (JSONObject) parser.parse(data);
+    log.info (obj.toString());
+    log.info (&quot;*****&quot;);
     JSONObject d = (JSONObject)  obj.get(&quot;data&quot;);
+    log.info (d.toString());
+    log.info (&quot;*****&quot;);
     JSONObject m = (JSONObject)  d.get(&quot;createComment&quot;);
+    log.info (m.toString());
+    log.info (&quot;*****&quot;);
     JSONObject p = (JSONObject)  m.get(&quot;project_media&quot;);
+    log.info (p.toString());
     JSONObject l = (JSONObject)  p.get(&quot;_log46RSmR&quot;);
-    log.info (l);
+    log.info (l.toString());
     JsonArray e = l.get(&quot;edges&quot;).asArray();
-    log.info (e);
+    log.info (e.toString());
     JSONObject n = (JSONObject) e.get(0);
-    log.info (n);
-    JSONObject a = (JSONObject) n.get(&quot;annotation&quot;);
-    log.info (a);
+    log.info (n.toString());
+    JSONObject nn = (JSONObject) n.get(&quot;node&quot;);
+    log.info (nn.toString());
+    JSONObject a = (JSONObject) nn.get(&quot;annotation&quot;);
+    log.info (a.toString());
     
     log.info (a.get(&quot;id&quot;));
     log.info (&quot;====&quot;);
     vars.put(&quot;annotation_id&quot;, a.get(&quot;id&quot;));
 }
 
+/*
 &quot;_log46RSmR&quot;: {
 					&quot;edges&quot;: [{
 						&quot;node&quot;: {
 							&quot;task&quot;: null,
 							&quot;annotation&quot;: {
 								&quot;id&quot;: &quot;QW5ub3RhdGlvbi8yNTU0OQ==\n&quot;,
-
+*/
 if (response.contains(&quot;\&quot;createProject\&quot;&quot;)){
     String jsonString  = response;
     JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
@@ -954,57 +1021,18 @@ if (response.contains(&quot;\&quot;createProject\&quot;&quot;)){
 		vars.put(&quot;project_ids&quot;, id);
 		vars.put(&quot;project_titles&quot;, slug);		
 	}
-}</stringProp>
+}
+} catch (Exception ex) {
+    log.info(&quot;XXXXXXXXXXXXXXXXXXXXXXX\n\n&quot;);
+    log.info(&quot;Error in POS beanshell&quot;);
+    log.info(ex);
+    log.info(&quot;\n\nXXXXXXXXXXXXXXXXXXXXXXX&quot;);
+}
+</stringProp>
         </BeanShellPostProcessor>
         <hashTree/>
         <RecordingController guiclass="RecordController" testclass="RecordingController" testname="Recording Controller" enabled="true"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="3183 /" enabled="true">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
-              <collectionProp name="Arguments.arguments"/>
-            </elementProp>
-            <stringProp name="HTTPSampler.domain">test.checkmedia.org</stringProp>
-            <stringProp name="HTTPSampler.port">443</stringProp>
-            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-            <stringProp name="HTTPSampler.response_timeout"></stringProp>
-            <stringProp name="HTTPSampler.protocol">https</stringProp>
-            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/</stringProp>
-            <stringProp name="HTTPSampler.method">GET</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-            <boolProp name="HTTPSampler.monitor">false</boolProp>
-            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          </HTTPSamplerProxy>
-          <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-              <collectionProp name="HeaderManager.headers">
-                <elementProp name="Accept-Language" elementType="Header">
-                  <stringProp name="Header.name">Accept-Language</stringProp>
-                  <stringProp name="Header.value">en-US,en;q=0.8</stringProp>
-                </elementProp>
-                <elementProp name="Upgrade-Insecure-Requests" elementType="Header">
-                  <stringProp name="Header.name">Upgrade-Insecure-Requests</stringProp>
-                  <stringProp name="Header.value">1</stringProp>
-                </elementProp>
-                <elementProp name="Accept-Encoding" elementType="Header">
-                  <stringProp name="Header.name">Accept-Encoding</stringProp>
-                  <stringProp name="Header.value">gzip, deflate, sdch, br</stringProp>
-                </elementProp>
-                <elementProp name="User-Agent" elementType="Header">
-                  <stringProp name="Header.name">User-Agent</stringProp>
-                  <stringProp name="Header.value">Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36</stringProp>
-                </elementProp>
-                <elementProp name="Accept" elementType="Header">
-                  <stringProp name="Header.name">Accept</stringProp>
-                  <stringProp name="Header.value">text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</stringProp>
-                </elementProp>
-              </collectionProp>
-            </HeaderManager>
-            <hashTree/>
-          </hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="3185 /" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
@@ -2469,6 +2497,7 @@ if (response.contains(&quot;\&quot;createProject\&quot;&quot;)){
                   <stringProp name="Argument.name">email</stringProp>
                   <stringProp name="Argument.value">sysops1492452698@meedan.com</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
@@ -2987,6 +3016,7 @@ if (response.contains(&quot;\&quot;createProject\&quot;&quot;)){
                   <stringProp name="Argument.name">email</stringProp>
                   <stringProp name="Argument.value">sysops1492452698@meedan.com</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
@@ -3530,12 +3560,14 @@ if (response.contains(&quot;\&quot;createProject\&quot;&quot;)){
                   <stringProp name="Argument.name">api_user[email]</stringProp>
                   <stringProp name="Argument.value">sysops1492452698@meedan.com</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
                 <elementProp name="api_user[password]" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">api_user[password]</stringProp>
                   <stringProp name="Argument.value">12345678</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
