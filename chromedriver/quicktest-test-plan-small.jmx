@@ -551,7 +551,7 @@ boolean isJSONValid(String test) {
 }
 
 arguments = ctx.getCurrentSampler().getArguments();
-log.info (&quot;====&quot; + ctx.getCurrentSampler().getName().toString() + &quot; == &quot; + ctx.getThreadNum().toString() + &quot; || ANOT = &quot;+vars.get(&quot;annotated_dbid&quot;).toString());
+log.info (&quot;====&quot; + ctx.getCurrentSampler().getName().toString() + &quot; == &quot; + ctx.getThreadNum().toString() + &quot; || ANOT = &quot;+vars.get(&quot;annotated_dbid&quot;).toString() + &quot; - MEDIA = &quot; + vars.get(&quot;media_dbid&quot;).toString());
 
 try {
 	if (ctx.getCurrentSampler().getName().contains(&quot;/api/users/sign_in&quot;)){	
@@ -736,7 +736,6 @@ for (int n=0; n&lt;arguments.getArgumentCount(); n++) {
 		     old = old.replace(&quot;team&quot;,&quot;&quot;);
 			i.put(&quot;slug&quot;,&quot;team&quot;+ctx.getThreadNum().toString()+vars.get(&quot;random_value&quot;).toString()+&quot;-&quot;+old);	
 		}
-log.info (&quot;4&quot; + vars.get(&quot;annotated_dbid&quot;).toString());
 
 		if (argument.getValue().contains(&quot;\&quot;team_id\&quot;:&quot;)){
 		     String v_original = v.toString();
@@ -755,33 +754,26 @@ log.info (&quot;4&quot; + vars.get(&quot;annotated_dbid&quot;).toString());
 		if (argument.getValue().contains(&quot;\&quot;user_id\&quot;:&quot;)){
 			i.put(&quot;user_id&quot;, Integer.parseInt(vars.get(&quot;user_dbid&quot;)));			
 		}			
-log.info (&quot;5&quot; + vars.get(&quot;annotated_dbid&quot;).toString());
 
 		if (argument.getValue().contains(&quot;\&quot;current_team_id\&quot;:&quot;)){
 			i.put (&quot;current_team_id&quot;, Integer.parseInt(vars.get(&quot;team_dbid&quot;)));			
 		}			
-log.info (&quot;6&quot; + vars.get(&quot;annotated_dbid&quot;).toString());
 
 		if (argument.getValue().contains(&quot;\&quot;annotated_id\&quot;:&quot;)){
 			log.info (&quot;-----ANOT ID++++++++++&quot;);
 			log.info (i.toString());
 			log.info (&quot;-----ANOT ID++++++++++&quot;);
-			log.info (vars.get(&quot;annotated_id&quot;).toString());
-			i.put (&quot;annotated_id&quot;, vars.get(&quot;annotated_id&quot;).toString());			
+			i.put (&quot;annotated_id&quot;, vars.get(&quot;media_dbid&quot;).toString());
+			//i.put (&quot;annotated_id&quot;, vars.get(&quot;annotated_id&quot;).toString());			
 		}			
 
-		//{&quot;variables&quot;:{&quot;input_0&quot;:{&quot;annotated_id&quot;:&quot;3750&quot;,&quot;clientMutationId&quot;:&quot;0&quot;,&quot;tag&quot;:&quot;1492453346&quot;,&quot;annotated_type&quot;:&quot;ProjectMedia&quot;}},&quot;query&quot;:&quot;mutation CreateTag($input_0:CreateTagInput!)
-
 		if (argument.getValue().contains(&quot;\&quot;id\&quot;:&quot;)){
-			log.info (&quot;ICI&quot;);
 			if  (argument.getValue().contains(&quot;UpdateTeamUser&quot;)) {
 				i.put(&quot;id&quot;, vars.get(&quot;team_user_id&quot;));			
 			}else if (argument.getValue().contains(&quot;UpdateUser&quot;)) {			
 				i.put(&quot;id&quot;, vars.get(&quot;id&quot;));			
 			}else if (argument.getValue().contains(&quot;mutation UpdateStatus&quot;)) {			
-				log.info (&quot;-----P ID&quot;);
 				i.put(&quot;id&quot;, vars.get(&quot;status_id&quot;));			
-				log.info (vars.get(&quot;status_id&quot;).toString());
 			}else if (argument.getValue().contains(&quot;DestroyAnnotation&quot;)){			
 				i.put(&quot;id&quot;, vars.get(&quot;annotation_id&quot;));			
 			}else{
@@ -931,16 +923,14 @@ if (response.contains(&quot;\&quot;current_team\&quot;:{\&quot;&quot;)) {
     JSONObject obj = (JSONObject) parser.parse(data);
 	log.info (&quot;\n @@@@@@@@@@TEAM $$$$$$$$&quot;);
     JSONObject t = (JSONObject)  obj.get(&quot;data&quot;);
-	log.info (t.toString());
 	if (t.toString().contains(&quot;\&quot;me\&quot;&quot;)) {
-
 	    JSONObject m = (JSONObject)  t.get(&quot;me&quot;);
 		log.info (m.toString());
 		if (m.toString().contains(&quot;\&quot;current_team\&quot;&quot;)) {
 		    JSONObject d = (JSONObject)  m.get(&quot;current_team&quot;);
 			log.info (&quot;5&quot;);
-		    log.info (d.toString());
-		    if (d.toString().contains(&quot;bdib&quot;)) {
+		    log.info (d.toString());		    
+		    if (d.toString().contains(&quot;dbib&quot;)) {
 				log.info (&quot;6&quot;);
 			    vars.put(&quot;team_id&quot;, (String)d.get(&quot;id&quot;));
 			    vars.put(&quot;team_dbid&quot;, Integer.toString((int)d.get(&quot;dbid&quot;)));
@@ -953,14 +943,13 @@ if (response.contains(&quot;\&quot;current_team\&quot;:{\&quot;&quot;)) {
 		    JSONObject d = (JSONObject)  t.get(&quot;current_team&quot;);
 			log.info (&quot;aa&quot;);
 		    log.info (d.toString());
-		    if (d.toString().contains(&quot;bdib&quot;)) {
+		    if (d.toString().contains(&quot;dbib&quot;)) {
 				log.info (&quot;bb&quot;);
 			    vars.put(&quot;team_id&quot;, (String)d.get(&quot;id&quot;));
 			    vars.put(&quot;team_dbid&quot;, Integer.toString((int)d.get(&quot;dbid&quot;)));
 			    log.info (vars.get(&quot;team_dbid&quot;).toString());
 	    		}
 		}
-		log.info (&quot;xxxxxxxxxxxxxxxxxxxx&quot;);
 	}
 	
 } 
@@ -41684,71 +41673,6 @@ if (response.contains(&quot;\&quot;createProject\&quot;&quot;)){
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&quot;query&quot;:&quot;query Search_SearchRelayQL($id_0:ID!) {node(id:$id_0) {id,__typename,...F0}} fragment F0 on CheckSearch {id,pusher_channel,_medias4qGNXv:medias(first:20) {edges {node {id,dbid,url,quote,published,embed,annotations_count,verification_statuses,overridden,project_id,pusher_channel,language,domain,permissions,last_status,last_status_obj {id,dbid},project {id,dbid,title},media {url,quote,embed_path,thumbnail_path,id},user {name,source {dbid,id},id},team {slug,id},_tags1XPk0s:tags(first:10000) {edges {node {tag,id},cursor},pageInfo {hasNextPage,hasPreviousPage}}},cursor},pageInfo {hasNextPage,hasPreviousPage}},number_of_results}&quot;,&quot;variables&quot;:{&quot;id_0&quot;:&quot;Q2hlY2tTZWFyY2gveyJwYXJlbnQiOnsidHlwZSI6InByb2plY3QiLCJpZCI6\nOTIxfSwicHJvamVjdHMiOls5MjFdfQ==\n&quot;},&quot;team&quot;:&quot;team21492452698&quot;}</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-              </collectionProp>
-            </elementProp>
-            <stringProp name="HTTPSampler.domain">check-api-test.checkmedia.org</stringProp>
-            <stringProp name="HTTPSampler.port">443</stringProp>
-            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-            <stringProp name="HTTPSampler.response_timeout"></stringProp>
-            <stringProp name="HTTPSampler.protocol">https</stringProp>
-            <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/api/graphql</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-            <boolProp name="HTTPSampler.monitor">false</boolProp>
-            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          </HTTPSamplerProxy>
-          <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-              <collectionProp name="HeaderManager.headers">
-                <elementProp name="Referer" elementType="Header">
-                  <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://test.checkmedia.org/team21492452698/project/921/media/3750</stringProp>
-                </elementProp>
-                <elementProp name="x-check-token" elementType="Header">
-                  <stringProp name="Header.name">x-check-token</stringProp>
-                  <stringProp name="Header.value">eyJwcm92aWRlciI6ImNoZWNrZGVzayIsImlkIjoiIiwidG9rZW4iOiJlb2N0++nYkZXOSIsInNlY3JldCI6IjdwUEhqNXhSIn0=++n</stringProp>
-                </elementProp>
-                <elementProp name="Accept-Language" elementType="Header">
-                  <stringProp name="Header.name">Accept-Language</stringProp>
-                  <stringProp name="Header.value">en-US,en;q=0.8</stringProp>
-                </elementProp>
-                <elementProp name="Origin" elementType="Header">
-                  <stringProp name="Header.name">Origin</stringProp>
-                  <stringProp name="Header.value">https://test.checkmedia.org</stringProp>
-                </elementProp>
-                <elementProp name="content-type" elementType="Header">
-                  <stringProp name="Header.name">content-type</stringProp>
-                  <stringProp name="Header.value">application/json</stringProp>
-                </elementProp>
-                <elementProp name="Accept-Encoding" elementType="Header">
-                  <stringProp name="Header.name">Accept-Encoding</stringProp>
-                  <stringProp name="Header.value">gzip, deflate, br</stringProp>
-                </elementProp>
-                <elementProp name="User-Agent" elementType="Header">
-                  <stringProp name="Header.name">User-Agent</stringProp>
-                  <stringProp name="Header.value">Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36</stringProp>
-                </elementProp>
-                <elementProp name="accept" elementType="Header">
-                  <stringProp name="Header.name">accept</stringProp>
-                  <stringProp name="Header.value">*/*</stringProp>
-                </elementProp>
-              </collectionProp>
-            </HeaderManager>
-            <hashTree/>
-          </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="5321 /api/graphql" enabled="true">
-            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-              <collectionProp name="Arguments.arguments">
-                <elementProp name="" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">{&quot;query&quot;:&quot;query Media_MediaRelayQL($id_0:ID!) {node(id:$id_0) {id,__typename,...F0}} fragment F0 on ProjectMedia {id,dbid,quote,published,url,embed,last_status,annotations_count,domain,permissions,project {id,dbid,title},project_id,pusher_channel,verification_statuses,overridden,language,media {url,quote,embed_path,thumbnail_path,id},user {name,email,source {dbid,_accountsuodPy:accounts(first:10000) {edges {node {url,id},cursor},pageInfo {hasNextPage,hasPreviousPage}},id},id},last_status_obj {id,dbid},_tags1XPk0s:tags(first:10000) {edges {node {tag,id},cursor},pageInfo {hasNextPage,hasPreviousPage}},_tasks3x5xlg:tasks(first:10000) {edges {node {id,dbid,label,type,description,permissions,jsonoptions,first_response {id,dbid,permissions,content,annotator {name,id}}},cursor},pageInfo {hasNextPage,hasPreviousPage}},_log46RSmR:log(first:10000) {edges {node {id,dbid,item_type,item_id,event,event_type,created_at,object_after,object_changes_json,meta,_projects1RkNsH:projects(first:2) {edges {node {id,dbid,title},cursor},pageInfo {hasNextPage,hasPreviousPage}},user {name,profile_image,email,source {dbid,_accountsuodPy:accounts(first:10000) {edges {node {url,id},cursor},pageInfo {hasNextPage,hasPreviousPage}},id},id},task {id,dbid,label,type},annotation {id,dbid,content,annotation_type,updated_at,created_at,permissions,_medias1MIYOS:medias(first:10000) {edges {node {id,dbid,quote,published,url,embed,project_id,last_status,annotations_count,permissions,verification_statuses,domain,team {slug,id},media {embed_path,thumbnail_path,url,quote,id},user {name,source {dbid,id},id}},cursor},pageInfo {hasNextPage,hasPreviousPage}},annotator {name,profile_image,id},version {id,item_id,item_type}}},cursor},pageInfo {hasNextPage,hasPreviousPage}},account {source {dbid,name,id},id},team {get_suggested_tags,slug,id}}&quot;,&quot;variables&quot;:{&quot;id_0&quot;:&quot;UHJvamVjdE1lZGlhLzM3NTA=\n&quot;},&quot;team&quot;:&quot;team21492452698&quot;}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
