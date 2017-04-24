@@ -72,10 +72,12 @@ The idea of load testing is to run several concurrent instances of the integrati
 
 ### Running load tests locally
 
-- Edit `./check-web/test/config.yml` and add the following line to it: `proxy: localhost:8080`
-- Start Check app in `test` mode
 - Download and install Apache JMeter 3.0 on your LOCAL machine
-- Run `/path/to/apache-jmeter-3.0/bin/jmeter -JAUTH_USER=your-test-stage-http-auth-username -JAUTH_PASS=your-test-stage-http-auth-password -n -t ./chromedriver/check-test-plan.jmx -l ~/check-test-results.jtl` where `check-test-results.jtl` is the [JMeter test run results file](https://wiki.apache.org/jmeter/JtlFiles).
+- Download `test-checkmedia-auth.txt` file containing _HTTP Authorization Manager_ passwords
+- Open the test plan (`./chromedriver/check-test-plan.jmx` or `./chromedriver/quicktest-test-plan-small.jmx`) in Jmeter GUI
+- Go to _HTTP Authorization Manager_ in the left menu. Click `load` button at _HTTP Authorization Manager_ window. Open `test-checkmedia-auth.txt` file and its content will be loaded at _HTTP Authorization Manager_ window
+- Save test plan (`.jmx` file) and quit Jmeter GUI
+- Run  `path/to/apache-jmeter-3.0/bin/jmeter -n -t /check-app/chromedriver/quicktest-test-plan-small.jmx -l check-test-results.jtl` where `check-test-results.jtl` is the [JMeter test run results file](https://wiki.apache.org/jmeter/JtlFiles)
 
 ## Helpful one-liners and scripts
 
